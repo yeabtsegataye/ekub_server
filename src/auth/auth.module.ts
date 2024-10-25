@@ -17,10 +17,10 @@ import { APP_GUARD } from '@nestjs/core';
   }),],
   controllers: [AuthController],
   providers: [AuthService,
-    // { // remove this to make manual guard
-    //   provide: APP_GUARD, // to make the guard for all routh
-    //   useClass: AuthGuard,
-    // }
+     { // remove this to make manual guard
+      provide: APP_GUARD, // to make the guard for all routh
+      useClass: AuthGuard,
+     }
   ],
 })
 export class AuthModule {}

@@ -4,12 +4,14 @@ import {
   Injectable,
   UnauthorizedException,
   ForbiddenException,
+  Req,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { jwtConstants } from './constants';
 import { Request } from 'express';
 import { IS_PUBLIC_KEY } from './public.decorator';
 import { Reflector } from '@nestjs/core';
+import { CustomRequest } from './custom-request.interface';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -72,7 +74,6 @@ export class AuthGuard implements CanActivate {
 
   private extractAccessToken(request: Request): string | undefined {
     // Check Authorization header for access token
-    console.log(request.headers,'acce form guardS')
     const authHeader = request.headers.authorization;
     if (authHeader && authHeader.startsWith('Bearer ')) {
       return authHeader.split(' ')[1];
@@ -81,8 +82,10 @@ export class AuthGuard implements CanActivate {
     return request.cookies?.access_token;
   }
 
-  private extractRefreshToken(request: Request): any | undefined {
-    console.log('form guard veri',request.cookies)
+  private extractRefreshToken( @Req() request: CustomRequest): any | undefined {
+    console.log('form guard veri',request)
+    console.log('form guard veri 11',request.cookies?.refresh_token)
+
     // Check cookies for refresh token
     return request.cookies?.refresh_token;
   }

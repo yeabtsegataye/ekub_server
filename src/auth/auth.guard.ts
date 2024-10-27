@@ -72,7 +72,7 @@ export class AuthGuard implements CanActivate {
 
   private extractAccessToken(request: Request): string | undefined {
     // Check Authorization header for access token
-    console.log(request,'acce form guardS')
+    console.log(request.headers,'acce form guardS')
     const authHeader = request.headers.authorization;
     if (authHeader && authHeader.startsWith('Bearer ')) {
       return authHeader.split(' ')[1];
@@ -82,7 +82,7 @@ export class AuthGuard implements CanActivate {
   }
 
   private extractRefreshToken(request: Request): string | undefined {
-    console.log(request,'form guard veri')
+    console.log(request.cookies,'form guard veri')
     // Check cookies for refresh token
     return request.cookies?.refresh_token;
   }

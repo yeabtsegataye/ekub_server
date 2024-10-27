@@ -70,7 +70,7 @@ export class AuthService {
 
         res.cookie('refresh_token', refreshToken, {
           httpOnly: true,
-          secure: false, // Set to true in production
+          secure: true, // Set to true in production
           sameSite: 'strict', // or 'lax'
         });
         return res.send({ accessToken });
@@ -178,7 +178,7 @@ export class AuthService {
 
     res.cookie('refresh_token', refreshToken, {
       httpOnly: true,
-      secure: false, // Set to true in production
+      secure: true, // Set to true in production
       sameSite: 'strict', // or 'lax'
     });
 
@@ -194,6 +194,7 @@ export class AuthService {
   /////////////////////////////////
   async refreshToken(@Res() res: Response, @Req() req: CustomRequest) {
     const refreshToken = req.cookies.refresh_token;
+    console.log(refreshToken,'the ref token')
     //const access_token = req.headers.authorization;
 
     if (!refreshToken) {

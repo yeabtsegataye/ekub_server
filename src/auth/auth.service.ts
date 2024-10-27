@@ -198,7 +198,7 @@ export class AuthService {
     //const access_token = req.headers.authorization;
 
     if (!refreshToken) {
-      throw new UnauthorizedException('No token found');
+      throw new UnauthorizedException('No token found on the request');
     }
     try {
       const payload = await this.jwtService.verify(refreshToken, {
@@ -210,7 +210,7 @@ export class AuthService {
         { id, email },
         {
           secret: jwtConstants.Access_secret,
-          expiresIn: '30s',
+          expiresIn: '60m',
         },
       );
       console.log('sented acc ', accessToken);
@@ -223,20 +223,14 @@ export class AuthService {
       }
       throw new UnauthorizedException('Invalid refresh token');
     }
-    // }
-    //  else {
-    //   throw new UnauthorizedException('Invalid access token');
-    // }
-
-    ///////////////////
   }
   ////////////////////////////////
   async verifiToken(@Res() res: Response, @Req() req: CustomRequest) {
     const refreshToken = req.cookies.refresh_token;
     const access_token = req.headers.authorization;
-    //console.log(refreshToken, "ref" , access_token ,'accs')
+    console.log(refreshToken, "ref" , access_token ,'accs')
     if (!refreshToken || !access_token) {
-      throw new UnauthorizedException('No token found');
+      throw new UnauthorizedException('No token found from veriftoken');
     }
     try {
       const acc = this.extractAccessToken(access_token);

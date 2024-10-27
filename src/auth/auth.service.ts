@@ -178,7 +178,7 @@ export class AuthService {
 
     res.cookie('refresh_token', refreshToken, {
       httpOnly: true,
-      secure: true, // Set to true in production
+      secure: false, // Set to true in production
       sameSite: 'strict', // or 'lax'
     });
 

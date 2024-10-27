@@ -83,8 +83,8 @@ export class AuthGuard implements CanActivate {
   }
 
   private extractRefreshToken( @Req() request: CustomRequest): any | undefined {
-    console.log('form guard veri',request)
-    console.log('form guard veri 11',request.cookies?.refresh_token)
+    //console.log('form guard veri',request)
+    console.log('form guard veri 11',request.cookies)
 
     // Check cookies for refresh token
     return request.cookies?.refresh_token;

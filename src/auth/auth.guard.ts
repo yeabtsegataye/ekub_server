@@ -82,7 +82,7 @@ export class AuthGuard implements CanActivate {
     return request.cookies?.access_token;
   }
 
-  private extractRefreshToken( @Req() request: CustomRequest): any | undefined {
+  private extractRefreshToken( @Req() request: CustomRequest) {
     //console.log('form guard veri',request)
     console.log('form guard veri 11',request.cookies)
 

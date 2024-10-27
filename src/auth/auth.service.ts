@@ -135,7 +135,8 @@ export class AuthService {
   /////////////////////////////////
 
   async login(@Body() authDTO: CreateAuthDto, @Res() res: Response) {
-    const SECRET_KEY = process.env.SECRET_KEY; // Ensure this matches the frontend key
+    const SECRET_KEY = process.env.SECRET_KEY; // Match this with the frontend encryption key
+    
     const decryptData = (encryptedData: string) => {
       try {
         const bytes = CryptoJS.AES.decrypt(encryptedData, SECRET_KEY);
@@ -145,43 +146,45 @@ export class AuthService {
         throw new UnauthorizedException('Invalid encrypted data');
       }
     };
-
+  
     const decryptedPassword = decryptData(authDTO.Password);
     if (!decryptedPassword) {
       return res.status(400).send('Invalid encrypted password');
     }
-
+  
     const user = await this.userRepository.findOne({
       where: { email: authDTO.email },
     });
-
+  
     if (!user) {
       return res.status(404).send('No user found');
     }
-
+  
     const isMatch = await bcrypt.compare(decryptedPassword, user.Password);
     if (!isMatch) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('Password does not match');
     }
-
+  
     const payload = { id: user.id, email: user.email, phone: user.phone };
-
+  
     const accessToken = this.jwtService.sign(payload, {
       secret: jwtConstants.Access_secret,
       expiresIn: '60m',
     });
-
+  
     const refreshToken = this.jwtService.sign(payload, {
       secret: jwtConstants.Refresh_secret,
       expiresIn: '90d',
     });
-
+  
     res.cookie('refresh_token', refreshToken, {
       httpOnly: true,
-      secure: false, // Set to true in production
-      sameSite: 'strict', // or 'lax'
+      secure: process.env.NODE_ENV === 'production', // Use HTTPS in production
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // Use 'none' if on different domains, 'lax' for same domain
     });
-
+    
+  
+    // Send access token and payload as response
     return res.send({ accessToken, user: payload });
   }
   /////////////////////////////////

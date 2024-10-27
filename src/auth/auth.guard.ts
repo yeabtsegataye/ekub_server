@@ -34,7 +34,7 @@ export class AuthGuard implements CanActivate {
     const refreshToken = this.extractRefreshToken(request);
 
     if (!accessToken || !refreshToken) {
-      throw new UnauthorizedException('No tokens found');
+      throw new UnauthorizedException('No tokens found on the guard');
     }
 
     try {
@@ -72,6 +72,7 @@ export class AuthGuard implements CanActivate {
 
   private extractAccessToken(request: Request): string | undefined {
     // Check Authorization header for access token
+    console.log(request,'acce form guardS')
     const authHeader = request.headers.authorization;
     if (authHeader && authHeader.startsWith('Bearer ')) {
       return authHeader.split(' ')[1];
@@ -81,6 +82,7 @@ export class AuthGuard implements CanActivate {
   }
 
   private extractRefreshToken(request: Request): string | undefined {
+    console.log(request,'form guard veri')
     // Check cookies for refresh token
     return request.cookies?.refresh_token;
   }

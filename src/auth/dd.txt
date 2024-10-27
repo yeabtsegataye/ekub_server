@@ -4,12 +4,14 @@ import {
   Injectable,
   UnauthorizedException,
   ForbiddenException,
+  Req,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { jwtConstants } from './constants';
 import { Request } from 'express';
 import { IS_PUBLIC_KEY } from './public.decorator';
 import { Reflector } from '@nestjs/core';
+import { CustomRequest } from './custom-request.interface';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -18,7 +20,7 @@ export class AuthGuard implements CanActivate {
     private readonly reflector: Reflector,
   ) {}
 
-  async canActivate(context: ExecutionContext): Promise<boolean> {
+    async canActivate(context: ExecutionContext): Promise<boolean> {
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       context.getHandler(),
       context.getClass(),
@@ -32,21 +34,20 @@ export class AuthGuard implements CanActivate {
 
     const accessToken = this.extractAccessToken(request);
     const refreshToken = this.extractRefreshToken(request);
-    // console.log('acc',accessToken,)
-    // console.log('ref', refreshToken)
+
     if (!accessToken || !refreshToken) {
-      throw new UnauthorizedException('No tokens found');
+      throw new UnauthorizedException('No tokens found on the guard');
     }
 
     try {
       const accessPayload = await this.jwtService.verifyAsync(accessToken, {
         secret: jwtConstants.Access_secret,
       });
-      console.log(accessPayload, 'accp');
       request['user'] = accessPayload; // Attach payload to request
     } catch (error) {
       console.log(error.name, 'errrrorr');
       if (error.name === 'TokenExpiredError') {
+        
         // If the access token is expired, check the refresh token
         throw new ForbiddenException('Access token expired ');
       } else {
@@ -55,10 +56,10 @@ export class AuthGuard implements CanActivate {
     }
     //////////////////////
     try {
-      const reftoken = await this.jwtService.verifyAsync(refreshToken, {
+      await this.jwtService.verifyAsync(refreshToken, {
         secret: jwtConstants.Refresh_secret,
       });
-      console.log(reftoken, 'reftokn');
+
       // Refresh token is valid, but access token is expired, so return 403
     } catch (refreshError) {
       if (refreshError.name === 'TokenExpiredError') {
@@ -81,7 +82,7 @@ export class AuthGuard implements CanActivate {
     return request.cookies?.access_token;
   }
 
-  private extractRefreshToken(request: Request): string | undefined {
+  private extractRefreshToken( @Req() request: CustomRequest) {
     // Check cookies for refresh token
     return request.cookies?.refresh_token;
   }
